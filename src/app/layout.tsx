@@ -24,8 +24,13 @@ const firaCode = Fira_Code({
   variable: '--font-fira-code',
 });
 
+// Get the base URL for GitHub Pages or default to production URL
+const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH 
+  ? `https://${process.env.VERCEL_URL || 'yourusername.github.io'}${process.env.NEXT_PUBLIC_BASE_PATH}`
+  : 'https://motoblog.com';
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://motoblog.com'),
+  metadataBase: new URL(baseUrl),
   title: {
     default: 'MotoBlog - Your Ultimate Motorcycle Resource',
     template: '%s | MotoBlog',

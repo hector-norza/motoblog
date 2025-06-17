@@ -140,7 +140,7 @@ export default async function BlogPost({ params }: Props) {
         {/* Featured Image */}
         <div className="mb-10 overflow-hidden rounded-lg">
           <OptimizedImage
-            src={getImagePath(post.image)}
+            src={getImagePath(post.image, '/images/placeholder.jpg')}
             alt={post.title}
             width={1200}
             height={630}
