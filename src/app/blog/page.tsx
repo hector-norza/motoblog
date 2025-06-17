@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 import { compareDesc } from 'date-fns';
-import AdvancedSearch from '@/components/blog/AdvancedSearch';
+import EnhancedAdvancedSearch from '@/components/blog/EnhancedAdvancedSearch';
 import BlogGrid from '@/components/blog/BlogGrid';
 import BlogSidebar from '@/components/blog/BlogSidebar';
-import Pagination from '@/components/ui/Pagination';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import { allBlogPosts } from '@/lib/blog-data';
+import InfiniteBlogPage from './InfiniteBlogPage';
 
 export const metadata: Metadata = {
   title: 'Motorcycle Blog | Tips, Reviews & Stories | MotoBlog',
@@ -84,17 +84,8 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
     });
   }
   
-  // Calculate pagination
-  const totalPosts = filteredPosts.length;
-  const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
-  
-  // Ensure current page is within valid range
-  const validatedPage = Math.min(Math.max(1, currentPage), totalPages || 1);
-  
-  // Get posts for current page
-  const startIndex = (validatedPage - 1) * POSTS_PER_PAGE;
-  const endIndex = startIndex + POSTS_PER_PAGE;
-  const currentPosts = filteredPosts.slice(startIndex, endIndex);
+  // Get initial posts for the first page
+  const initialPosts = filteredPosts.slice(0, POSTS_PER_PAGE);
 
   // Generate categories and tags metadata
   const categories = Array.from(new Set(allBlogPosts.map(post => post.category)));
@@ -111,11 +102,13 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
     return acc;
   }, {} as Record<string, number>);
 
+  // Use the client component for infinite scrolling
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Import the client component for infinite scrolling */}
       <div className="mb-8">
         <h1 className="mb-4 font-display text-4xl font-bold">Blog</h1>
-        <AdvancedSearch 
+        <EnhancedAdvancedSearch 
           initialQuery={searchQuery}
           initialCategory={category}
           initialTag={tag}
@@ -126,19 +119,18 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-        <div className="mb-6 lg:col-span-3">  {/* Added mb-6 for better spacing */}
-          {currentPosts.length > 0 ? (
-            <>
-              <BlogGrid posts={currentPosts} />
-              {totalPages > 1 && (
-                <Pagination
-                  currentPage={validatedPage}
-                  totalPages={totalPages}
-                  baseUrl="/blog"
-                  queryParams={searchParams}
-                />
-              )}
-            </>
+        <div className="mb-6 lg:col-span-3">
+          {initialPosts.length > 0 ? (
+            <div className="animate-fade-in">
+              {/* @ts-expect-error Server Component */}
+              <InfiniteBlogPage
+                initialPosts={initialPosts}
+                categories={categories}
+                tags={tags}
+                categoryCounts={categoryCounts}
+                tagCounts={tagCounts}
+              />
+            </div>
           ) : (
             <div className="rounded-lg border border-border p-8 text-center">
               <h2 className="mb-2 text-xl font-semibold">No Posts Found</h2>

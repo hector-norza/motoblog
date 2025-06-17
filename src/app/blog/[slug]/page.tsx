@@ -5,13 +5,14 @@ import { FaCalendarAlt, FaClock, FaUser, FaTag } from 'react-icons/fa';
 import { Metadata, ResolvingMetadata } from 'next';
 import { allBlogPosts } from '@/lib/blog-data';
 import { getRelatedPosts } from '@/lib/blog-utils';
+import { getImagePath } from '@/lib/image-utils';
 import EnhancedShareButtons from '@/components/blog/EnhancedShareButtons';
 import AuthorBio from '@/components/blog/AuthorBio';
 import RelatedPosts from '@/components/blog/RelatedPosts';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 import TableOfContents from '@/components/blog/TableOfContents';
-import ReadingProgress from '@/components/ui/ReadingProgress';
+import EnhancedReadingProgress from '@/components/ui/EnhancedReadingProgress';
 
 // Type for the page props
 type Props = {
@@ -107,7 +108,7 @@ export default async function BlogPost({ params }: Props) {
   return (
     <div className="container mx-auto px-4 py-12">
       <ScrollToTop />
-      <ReadingProgress />
+      <EnhancedReadingProgress showPercentage={true} color="primary" height={4} />
       <article className="mx-auto max-w-4xl">
         {/* Post Header */}
         <header className="mb-10">
@@ -139,11 +140,13 @@ export default async function BlogPost({ params }: Props) {
         {/* Featured Image */}
         <div className="mb-10 overflow-hidden rounded-lg">
           <OptimizedImage
-            src={post.image}
+            src={getImagePath(post.image)}
             alt={post.title}
             width={1200}
             height={630}
             className="h-auto w-full object-cover"
+            animateIn={true}
+            showLoadingEffect={true}
           />
         </div>
 

@@ -3,7 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import { allBlogPosts } from '@/lib/blog-data';
-import MotorcycleShowcase from '@/components/buying-guides/MotorcycleShowcase';
+import { motorcycles } from '@/lib/motorcycle-data';
+import DynamicMotorcycleShowcase from '@/components/buying-guides/DynamicMotorcycleShowcase';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 
 export const metadata: Metadata = {
@@ -80,7 +81,7 @@ export default function BuyingGuidesPage() {
           </p>
         </div>
         
-        <MotorcycleShowcase />
+        <DynamicMotorcycleShowcase initialMotorcycles={motorcycles} />
       </section>
 
       {/* Content Sections */}
