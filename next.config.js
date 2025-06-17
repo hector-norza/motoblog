@@ -25,10 +25,6 @@ const nextConfig = {
     unoptimized: true, // Required for static export
   },
   swcMinify: true,
-  // Disable server components for static export
-  experimental: {
-    appDir: true,
-  },
 };
 
 module.exports = withContentlayer(nextConfig);
