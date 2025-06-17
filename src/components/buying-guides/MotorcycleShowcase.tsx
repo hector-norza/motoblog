@@ -1,0 +1,297 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { FaMotorcycle, FaTachometerAlt, FaWeightHanging, FaDollarSign, FaStar } from 'react-icons/fa';
+import OptimizedImage from '@/components/ui/OptimizedImage';
+import { motorcycles } from '@/lib/motorcycle-data';
+
+// Filter options
+const categories = [
+  { label: 'All Types', value: 'all' },
+  { label: 'Sport', value: 'Sport' },
+  { label: 'Naked', value: 'Naked' },
+  { label: 'Adventure', value: 'Adventure' },
+  { label: 'Cruiser', value: 'Cruiser' },
+  { label: 'Retro', value: 'Retro' },
+];
+
+const beginnerOptions = [
+  { label: 'All Bikes', value: 'all' },
+  { label: 'Beginner Friendly', value: 'beginner' },
+  { label: 'Experienced Riders', value: 'experienced' },
+];
+
+const engineSizes = [
+  { label: 'All Sizes', value: 'all' },
+  { label: 'Under 500cc', value: 'under500' },
+  { label: '500-800cc', value: '500-800' },
+  { label: '800-1200cc', value: '800-1200' },
+  { label: 'Over 1200cc', value: 'over1200' },
+];
+
+export default function MotorcycleShowcase() {
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [beginnerFilter, setBeginnerFilter] = useState('all');
+  const [engineFilter, setEngineFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('name');
+  const [filteredMotorcycles, setFilteredMotorcycles] = useState(motorcycles);
+
+  // Filter and sort motorcycles when filters change
+  useEffect(() => {
+    let result = [...motorcycles];
+    
+    // Apply category filter
+    if (categoryFilter !== 'all') {
+      result = result.filter(moto => moto.category === categoryFilter);
+    }
+    
+    // Apply beginner filter
+    if (beginnerFilter !== 'all') {
+      if (beginnerFilter === 'beginner') {
+        result = result.filter(moto => moto.beginner_friendly);
+      } else {
+        result = result.filter(moto => !moto.beginner_friendly);
+      }
+    }
+    
+    // Apply engine size filter
+    if (engineFilter !== 'all') {
+      switch (engineFilter) {
+        case 'under500':
+          result = result.filter(moto => moto.displacement < 500);
+          break;
+        case '500-800':
+          result = result.filter(moto => moto.displacement >= 500 && moto.displacement < 800);
+          break;
+        case '800-1200':
+          result = result.filter(moto => moto.displacement >= 800 && moto.displacement < 1200);
+          break;
+        case 'over1200':
+          result = result.filter(moto => moto.displacement >= 1200);
+          break;
+      }
+    }
+    
+    // Apply sorting
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case 'price-low':
+          return a.price - b.price;
+        case 'price-high':
+          return b.price - a.price;
+        case 'engine-low':
+          return a.displacement - b.displacement;
+        case 'engine-high':
+          return b.displacement - a.displacement;
+        case 'rating':
+          return b.rating - a.rating;
+        default:
+          return a.name.localeCompare(b.name);
+      }
+    });
+    
+    setFilteredMotorcycles(result);
+  }, [categoryFilter, beginnerFilter, engineFilter, sortBy]);
+
+  return (
+    <div className="space-y-8">
+      {/* Filters */}
+      <div className="space-y-4 rounded-lg border border-border bg-accent/10 p-4 md:p-6">
+        <h3 className="mb-2 text-lg font-medium">Find Your Perfect Motorcycle</h3>
+        
+        <div className="grid gap-4 md:grid-cols-4">
+          {/* Category Filter */}
+          <div>
+            <label htmlFor="category" className="mb-1 block text-sm font-medium">
+              Motorcycle Type
+            </label>
+            <select
+              id="category"
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            >
+              {categories.map((cat) => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          {/* Beginner Filter */}
+          <div>
+            <label htmlFor="beginner" className="mb-1 block text-sm font-medium">
+              Experience Level
+            </label>
+            <select
+              id="beginner"
+              value={beginnerFilter}
+              onChange={(e) => setBeginnerFilter(e.target.value)}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            >
+              {beginnerOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          {/* Engine Size Filter */}
+          <div>
+            <label htmlFor="engine" className="mb-1 block text-sm font-medium">
+              Engine Size
+            </label>
+            <select
+              id="engine"
+              value={engineFilter}
+              onChange={(e) => setEngineFilter(e.target.value)}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            >
+              {engineSizes.map((eng) => (
+                <option key={eng.value} value={eng.value}>
+                  {eng.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          {/* Sort By */}
+          <div>
+            <label htmlFor="sort" className="mb-1 block text-sm font-medium">
+              Sort By
+            </label>
+            <select
+              id="sort"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            >
+              <option value="name">Name (A-Z)</option>
+              <option value="price-low">Price (Low to High)</option>
+              <option value="price-high">Price (High to Low)</option>
+              <option value="engine-low">Engine Size (Low to High)</option>
+              <option value="engine-high">Engine Size (High to Low)</option>
+              <option value="rating">Rating (High to Low)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      {/* Results count */}
+      <div className="text-sm text-muted-foreground">
+        Showing {filteredMotorcycles.length} motorcycles
+      </div>
+      
+      {/* Motorcycles Grid */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`${categoryFilter}-${beginnerFilter}-${engineFilter}-${sortBy}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {filteredMotorcycles.length > 0 ? (
+            filteredMotorcycles.map((moto) => (
+              <motion.div
+                key={moto.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="group overflow-hidden rounded-lg border border-border bg-background shadow-sm transition-shadow hover:shadow-md"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <OptimizedImage
+                    src={moto.image}
+                    alt={moto.name}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="rounded-full bg-primary-500 px-2 py-1 text-xs font-medium text-white">
+                        {moto.category.charAt(0).toUpperCase() + moto.category.slice(1)}
+                      </span>
+                      <span className="rounded-full bg-slate-900/80 px-2 py-1 text-xs font-medium text-white">
+                        ${moto.price.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-xl font-bold">{moto.name}</h3>
+                    <div className="flex items-center">
+                      <FaStar className="text-yellow-500 mr-1" />
+                      <span className="font-medium">{moto.rating}</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-1">{moto.brand} • {moto.year}</p>
+                  
+                  <p className="mb-4 text-sm text-muted-foreground line-clamp-2">
+                    {moto.description}
+                  </p>
+                  
+                  <div className="mb-4 grid grid-cols-3 gap-2 text-center text-xs">
+                    <div className="rounded-md bg-accent/40 p-2">
+                      <FaTachometerAlt className="mx-auto mb-1 h-4 w-4 text-primary-500" />
+                      <span className="block font-medium">{moto.power} HP</span>
+                    </div>
+                    <div className="rounded-md bg-accent/40 p-2">
+                      <FaMotorcycle className="mx-auto mb-1 h-4 w-4 text-primary-500" />
+                      <span className="block font-medium">{moto.displacement}cc</span>
+                    </div>
+                    <div className="rounded-md bg-accent/40 p-2">
+                      <FaWeightHanging className="mx-auto mb-1 h-4 w-4 text-primary-500" />
+                      <span className="block font-medium">{moto.weight} lbs</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      {moto.beginner_friendly ? 
+                        <span className="text-green-500 font-medium">Beginner Friendly</span> : 
+                        <span className="text-amber-500 font-medium">Experienced Riders</span>
+                      }
+                    </span>
+                    <Link
+                      href={`/buying-guides/${moto.id}`}
+                      className="text-sm font-medium text-primary-500 hover:text-primary-600"
+                    >
+                      See Details
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <div className="col-span-full py-12 text-center">
+              <FaMotorcycle className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+              <h3 className="mb-2 text-xl font-semibold">No motorcycles found</h3>
+              <p className="text-muted-foreground">
+                Try adjusting your filters to see more options.
+              </p>
+              <button
+                onClick={() => {
+                  setCategoryFilter('all');
+                  setBeginnerFilter('all');
+                  setEngineFilter('all');
+                  setSortBy('name');
+                }}
+                className="mt-4 rounded-md bg-primary-500 px-4 py-2 text-sm font-medium text-white hover:bg-primary-600"
+              >
+                Reset Filters
+              </button>
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
